@@ -21,7 +21,7 @@ html, body, #root {
 
 #root {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
   overflow-x: hidden;
@@ -55,4 +55,39 @@ html, body, #root {
 
 .animate-circle-pop {
   animation: circle-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Phase transition */
+@keyframes phase-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-phase-enter {
+  animation: phase-enter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Sundial sun rise hint (suhoor phase) */
+@keyframes sun-rise-hint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-sun-rise {
+  animation: sun-rise-hint 4s ease-in-out infinite;
+}
+
+/* Sundial sun glow pulse */
+@keyframes sun-glow {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+
+.animate-sun-glow {
+  animation: sun-glow 3s ease-in-out infinite;
+}
+
+/* Textarea placeholder */
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
 }

@@ -1,11 +1,10 @@
 import { useLocation } from './hooks/useLocation';
 import { usePrayerTimes } from './hooks/usePrayerTimes';
-import { useSunCycle } from './hooks/useSunCycle';
+import { usePhase, useSunProgress } from './hooks/usePhase';
 import { getRamadanDay } from './lib/ramadan';
-import { SkyCard } from './components/SkyCard';
+import { SkyBackground } from './components/SkyBackground';
 import { Header } from './components/Header';
-import { RamadanGrid } from './components/RamadanGrid';
-import { EidCountdown } from './components/EidCountdown';
+import { PhaseView } from './components/PhaseView';
 import { LocationPrompt } from './components/LocationPrompt';
 
 function App() {
@@ -21,20 +20,20 @@ function App() {
 
   const today = getRamadanDay(new Date());
   const todayTimes = times[today];
-  const sunProgress = useSunCycle(todayTimes);
+  const phaseState = usePhase(todayTimes);
+  const numericSunProgress = useSunProgress(phaseState);
 
   return (
-    <div className="relative z-10 w-full max-w-[400px] mx-auto px-5 py-6 min-h-full flex flex-col justify-center">
-      <SkyCard sunProgress={sunProgress}>
-        <Header
-          locationError={!needsPermission ? locError : null}
-          todayPrayerTimes={todayTimes}
-        />
+    <>
+      <SkyBackground sunProgress={numericSunProgress} />
+
+      <div className="relative z-10 w-full max-w-[400px] mx-auto px-5 py-6 min-h-full flex flex-col">
+        <Header locationError={!needsPermission ? locError : null} />
 
         {needsPermission ? (
           <LocationPrompt onRequest={requestLocation} error={locError} />
         ) : loading ? (
-          <div className="flex items-center justify-center h-[200px]">
+          <div className="flex items-center justify-center h-[300px]">
             <div className="flex flex-col items-center gap-2.5">
               <div className="w-4 h-4 border-[1.5px] border-white/[0.06] border-t-white/30 rounded-full animate-spin" />
               <p className="text-[9px] text-white/15 tracking-wider">
@@ -43,21 +42,21 @@ function App() {
             </div>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center h-[200px]">
+          <div className="flex items-center justify-center h-[300px]">
             <p className="text-[10px] text-red-400/50 text-center px-4">{error}</p>
           </div>
-        ) : (
-          <>
-            <RamadanGrid sunProgress={sunProgress} todayPrayerTimes={todayTimes} />
-            <EidCountdown />
-          </>
-        )}
-      </SkyCard>
-
-      <p className="text-center text-[8px] text-white/[0.15] mt-4 tracking-[0.15em]">
-        Tap a circle to log your fast
-      </p>
-    </div>
+        ) : todayTimes ? (
+          <PhaseView
+            phase={phaseState.phase}
+            sunProgress={phaseState.sunProgress}
+            numericSunProgress={numericSunProgress}
+            prayerTimes={todayTimes}
+            minutesToIftar={phaseState.minutesToIftar}
+            minutesToFajr={phaseState.minutesToFajr}
+          />
+        ) : null}
+      </div>
+    </>
   );
 }
 

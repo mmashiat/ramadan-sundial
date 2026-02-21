@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'ramadan-calendar-1447';
+const STORAGE_KEY = 'ramadan-sundial-1447';
 
 export type FastingStatus = 'fasted' | 'missed' | null;
 
@@ -69,4 +69,37 @@ export function getCachedLocation(): { lat: number; lng: number } | null {
 
 export function cacheLocation(lat: number, lng: number): void {
   localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat, lng }));
+}
+
+// Journal — daily intentions and reflections
+const JOURNAL_KEY = 'ramadan-sundial-journal-1447';
+
+export interface DayJournal {
+  intention?: string;
+  reflection?: string;
+}
+
+export function getJournal(): Record<number, DayJournal> {
+  try {
+    const raw = localStorage.getItem(JOURNAL_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function getDayJournal(day: number): DayJournal {
+  return getJournal()[day] ?? {};
+}
+
+export function setIntention(day: number, text: string): void {
+  const journal = getJournal();
+  journal[day] = { ...journal[day], intention: text };
+  localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal));
+}
+
+export function setReflection(day: number, text: string): void {
+  const journal = getJournal();
+  journal[day] = { ...journal[day], reflection: text };
+  localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal));
 }
